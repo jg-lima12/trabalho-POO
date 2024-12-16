@@ -10,12 +10,18 @@ class EntradaInvalidaError(Exception):
     def __init__(self, mensagem):
         super().__init__(mensagem)
 
+class ValorNaoPodeSerVazioError(Exception):
+    def __init__(self, campo):
+        super().__init__(f"O campo '{campo}' não pode ser vazio.")
+
 def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def verificar_entrada(valor, tipo_esperado, campo):
     if not isinstance(valor, tipo_esperado):
         raise EntradaInvalidaError(f"Entrada inválida para o campo '{campo}'. Esperado: {tipo_esperado.__name__}")
+    if isinstance(valor, str) and not valor.strip():
+        raise ValorNaoPodeSerVazioError(campo)
 
 def main():
     sistema = SistemaDeUsuarios()
@@ -60,7 +66,7 @@ Resposta: ''')
                         verificar_entrada(turma, str, "Turma")
                         verificar_entrada(curso, str, "Curso")
                         verificar_entrada(tipo_grade, str, "Tipo de Grade")
-                    except EntradaInvalidaError as e:
+                    except (EntradaInvalidaError, ValorNaoPodeSerVazioError) as e:
                         print(f"Erro: {e}")
                         time.sleep(2)
                         continue
@@ -98,7 +104,7 @@ Resposta: ''')
 
             if escolha == "1":
                 limpar_terminal()
-                tipo = int(input(f'''	Tipo de Atividade
+                tipo = int(input(f'''\tTipo de Atividade
 
 {azul}[1]Tarefa
 [2]Projeto
@@ -113,6 +119,15 @@ Resposta: '''))
                 titulo = input("Título: ")
                 descricao = input("Descrição: ")
                 data_entrega = input("Data de Entrega: ")
+
+                try:
+                    verificar_entrada(titulo, str, "Título")
+                    verificar_entrada(descricao, str, "Descrição")
+                    verificar_entrada(data_entrega, str, "Data de Entrega")
+                except (EntradaInvalidaError, ValorNaoPodeSerVazioError) as e:
+                    print(f"Erro: {e}")
+                    time.sleep(2)
+                    continue
 
                 if tipo == 1:
                     disciplina = input("Disciplina: ")
@@ -144,6 +159,9 @@ Resposta: '''))
                 raise EntradaInvalidaError("Opção inválida no gerenciamento de atividades.")
 
         except EntradaInvalidaError as e:
+            print(f"Erro: {e}")
+            time.sleep(2)
+        except ValorNaoPodeSerVazioError as e:
             print(f"Erro: {e}")
             time.sleep(2)
         except Exception as e:
