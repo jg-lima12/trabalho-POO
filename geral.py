@@ -42,8 +42,9 @@ Resposta: ''')
             senha = input("Senha: ")
             if sistema.login(matricula, senha):
                 print("Login bem-sucedido!")
+                
                 time.sleep(1)
-                limpar_terminal()
+                
                 
                 # RELACIONAMENTO DE DEPENDÊNCIA entre SistemaDeUsuarios e Aluno
                 # Criação do aluno depende de um login bem-sucedido
@@ -64,12 +65,14 @@ Resposta: ''')
         else:
             print("\nOpção inválida.")
 
+
     # RELACIONAMENTO DE AGREGAÇÃO entre GerenciadorDeAtividades e Atividades:
     # A classe GerenciadorDeAtividades contém e gerencia várias instâncias de Tarefa, Projeto, Trabalho e Prova,
     # mas elas podem existir de forma independente de GerenciadorDeAtividades.
     gerenciador = GerenciadorDeAtividades()
 
     while True:
+        limpar_terminal()
         print("\nGerenciamento de Atividades")
         print(f"\n{azul}[1]Adicionar Atividade{fim}")
         print(f"{azul}[2]Exibir Atividades{fim}")
@@ -77,29 +80,39 @@ Resposta: ''')
         escolha = input("\nEscolha uma opção: ")
 
         if escolha == "1":
-            tipo = input("Tipo de Atividade (Tarefa, Projeto, Trabalho, Prova): ")
-            titulo = input("Título: ")
-            descricao = input("Descrição: ")
-            data_entrega = input("Data de Entrega: ")
+            limpar_terminal()
+            tipo = int(input(f'''\nTipo de Atividade
 
-            # RELACIONAMENTO DE HERANÇA entre Atividade e Tarefa, Projeto, Trabalho e Prova:
-            # As classes Tarefa, Projeto, Trabalho e Prova herdam características e comportamentos da classe base Atividade.
-            if tipo == "Tarefa":
-                disciplina = input("Disciplina: ")
-                atividade = Tarefa(titulo, descricao, data_entrega, disciplina)
-            elif tipo == "Projeto":
-                tipo_projeto = input("Tipo de Projeto: ")
-                professor_orientador = input("Professor Orientador: ")
-                data_inicio = input("Data de Início: ")
-                atividade = Projeto(titulo, descricao, data_entrega, tipo_projeto, professor_orientador, data_inicio)
-            elif tipo == "Trabalho":
-                disciplina = input("Disciplina: ")
-                atividade = Trabalho(titulo, descricao, data_entrega, disciplina)
-            elif tipo == "Prova":
-                disciplina = input("Disciplina: ")
-                horario = input("Horário: ")
-                tentativa = input("Tentativa: ")
-                atividade = Prova(titulo, descricao, data_entrega, disciplina, horario, tentativa)
+{azul}[1]Tarefa
+[2]Projeto
+[3]Trabalho
+[4]Prova{fim}
+
+Resposta: '''))
+            ver = [1,2,3,4]
+            if escolha in ver:
+                titulo = input("Título: ")
+                descricao = input("Descrição: ")
+                data_entrega = input("Data de Entrega: ")
+
+                # RELACIONAMENTO DE HERANÇA entre Atividade e Tarefa, Projeto, Trabalho e Prova:
+                # As classes Tarefa, Projeto, Trabalho e Prova herdam características e comportamentos da classe base Atividade.
+                if tipo == 1:
+                    disciplina = input("Disciplina: ")
+                    atividade = Tarefa(titulo, descricao, data_entrega, disciplina)
+                elif tipo == 2:
+                    tipo_projeto = input("Tipo de Projeto: ")
+                    professor_orientador = input("Professor Orientador: ")
+                    data_inicio = input("Data de Início: ")
+                    atividade = Projeto(titulo, descricao, data_entrega, tipo_projeto, professor_orientador, data_inicio)
+                elif tipo == 3:
+                    disciplina = input("Disciplina: ")
+                    atividade = Trabalho(titulo, descricao, data_entrega, disciplina)
+                elif tipo == 4:
+                    disciplina = input("Disciplina: ")
+                    horario = input("Horário: ")
+                    tentativa = input("Tentativa: ")
+                    atividade = Prova(titulo, descricao, data_entrega, disciplina, horario, tentativa)
             else:
                 print("Tipo de atividade inválido.")
                 continue
