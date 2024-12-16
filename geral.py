@@ -18,6 +18,10 @@ class EntradaNumericaIncorretaError(Exception):
     def __init__(self, campo):
         super().__init__(f"O valor fornecido para '{campo}' deve ser um número válido.")
 
+class DataInvalidaError(Exception):
+    def __init__(self, campo):
+        super().__init__(f"A data fornecida no campo '{campo}' está em um formato inválido. Use o formato DD/MM/AAAA.")
+
 def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -31,6 +35,12 @@ def verificar_entrada(valor, tipo_esperado, campo):
             int(valor)
         except ValueError:
             raise EntradaNumericaIncorretaError(campo)
+
+def verificar_data(data, campo):
+    try:
+        time.strptime(data, "%d/%m/%Y")
+    except ValueError:
+        raise DataInvalidaError(campo)
 
 def main():
     sistema = SistemaDeUsuarios()
@@ -113,7 +123,7 @@ Resposta: ''')
 
             if escolha == "1":
                 limpar_terminal()
-                tipo = int(input(f'''	Tipo de Atividade
+                tipo = int(input(f'''\tTipo de Atividade
 
 {azul}[1]Tarefa
 [2]Projeto
@@ -127,13 +137,14 @@ Resposta: '''))
 
                 titulo = input("Título: ")
                 descricao = input("Descrição: ")
-                data_entrega = input("Data de Entrega: ")
+                data_entrega = input("Data de Entrega (DD/MM/AAAA): ")
 
                 try:
                     verificar_entrada(titulo, str, "Título")
                     verificar_entrada(descricao, str, "Descrição")
                     verificar_entrada(data_entrega, str, "Data de Entrega")
-                except (EntradaInvalidaError, ValorNaoPodeSerVazioError) as e:
+                    verificar_data(data_entrega, "Data de Entrega")
+                except (EntradaInvalidaError, ValorNaoPodeSerVazioError, DataInvalidaError) as e:
                     print(f"Erro: {e}")
                     time.sleep(2)
                     continue
@@ -174,6 +185,9 @@ Resposta: '''))
             print(f"Erro: {e}")
             time.sleep(2)
         except EntradaNumericaIncorretaError as e:
+            print(f"Erro: {e}")
+            time.sleep(2)
+        except DataInvalidaError as e:
             print(f"Erro: {e}")
             time.sleep(2)
         except Exception as e:
