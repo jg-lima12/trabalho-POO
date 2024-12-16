@@ -10,35 +10,51 @@
 from usuario import SistemaDeUsuarios
 from atividade import Aluno
 from gerenciador import GerenciadorDeAtividades, Tarefa, Projeto, Trabalho, Prova
+from cor import azul, fim
+import os
+import time
+
+def limpar_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 def main():
     sistema = SistemaDeUsuarios()
     aluno = None
 
     while True:
-        print("1. Cadastrar")
-        print("2. Login")
-        escolha = input("Escolha uma opção: ")
+        limpar_terminal()
+        escolha = input(f'''Escolha uma opção:
+                        
+{azul}[1]Cadastrar
+[2]Login{fim}
+
+Resposta: ''')
 
         if escolha == "1":
-            matricula = input("Matrícula: ")
+            limpar_terminal()
+            matricula = input("\nMatrícula: ")
             senha = input("Senha: ")
             sistema.cadastrar_usuario(matricula, senha)
 
         elif escolha == "2":
-            matricula = input("Matrícula: ")
+            limpar_terminal()
+            matricula = input("\nMatrícula: ")
             senha = input("Senha: ")
             if sistema.login(matricula, senha):
                 print("Login bem-sucedido!")
+                time.sleep(1)
+                limpar_terminal()
                 
                 # RELACIONAMENTO DE DEPENDÊNCIA entre SistemaDeUsuarios e Aluno
                 # Criação do aluno depende de um login bem-sucedido
-                print("\nCadastro de Aluno")
+                print(f"\n{azul}Cadastro de Aluno{fim}")
                 nome = input("Nome completo: ")
                 idade = input("Idade: ")
                 turma = input("Turma: ")
                 curso = input("Curso: ")
                 tipo_grade = input("Tipo de Grade: ")
+                limpar_terminal()
+                time.sleep(1)
 
                 aluno = Aluno(nome, idade, turma, curso, tipo_grade, matricula)
                 print("\nDados do Aluno:")
@@ -46,7 +62,7 @@ def main():
                 break  # Sai do loop após login e criação do aluno
 
         else:
-            print("Opção inválida.")
+            print("\nOpção inválida.")
 
     # RELACIONAMENTO DE AGREGAÇÃO entre GerenciadorDeAtividades e Atividades:
     # A classe GerenciadorDeAtividades contém e gerencia várias instâncias de Tarefa, Projeto, Trabalho e Prova,
@@ -55,10 +71,10 @@ def main():
 
     while True:
         print("\nGerenciamento de Atividades")
-        print("1. Adicionar Atividade")
-        print("2. Exibir Atividades")
-        print("3. Sair")
-        escolha = input("Escolha uma opção: ")
+        print(f"\n{azul}[1]Adicionar Atividade{fim}")
+        print(f"{azul}[2]Exibir Atividades{fim}")
+        print(f"{azul}[3]Sair{fim}")
+        escolha = input("\nEscolha uma opção: ")
 
         if escolha == "1":
             tipo = input("Tipo de Atividade (Tarefa, Projeto, Trabalho, Prova): ")
