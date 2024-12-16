@@ -5,7 +5,7 @@ from cor import azul, fim
 import os
 import time
 
-# Exceção Personalizada
+# Exceções Personalizadas
 class EntradaInvalidaError(Exception):
     def __init__(self, mensagem):
         super().__init__(mensagem)
@@ -13,6 +13,10 @@ class EntradaInvalidaError(Exception):
 class ValorNaoPodeSerVazioError(Exception):
     def __init__(self, campo):
         super().__init__(f"O campo '{campo}' não pode ser vazio.")
+
+class EntradaNumericaIncorretaError(Exception):
+    def __init__(self, campo):
+        super().__init__(f"O valor fornecido para '{campo}' deve ser um número válido.")
 
 def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -22,6 +26,11 @@ def verificar_entrada(valor, tipo_esperado, campo):
         raise EntradaInvalidaError(f"Entrada inválida para o campo '{campo}'. Esperado: {tipo_esperado.__name__}")
     if isinstance(valor, str) and not valor.strip():
         raise ValorNaoPodeSerVazioError(campo)
+    if tipo_esperado == int:
+        try:
+            int(valor)
+        except ValueError:
+            raise EntradaNumericaIncorretaError(campo)
 
 def main():
     sistema = SistemaDeUsuarios()
@@ -62,11 +71,11 @@ Resposta: ''')
                     try:
                         # Verificações para garantir a validade dos dados
                         verificar_entrada(nome, str, "Nome completo")
-                        verificar_entrada(idade, str, "Idade")
+                        verificar_entrada(idade, int, "Idade")
                         verificar_entrada(turma, str, "Turma")
                         verificar_entrada(curso, str, "Curso")
                         verificar_entrada(tipo_grade, str, "Tipo de Grade")
-                    except (EntradaInvalidaError, ValorNaoPodeSerVazioError) as e:
+                    except (EntradaInvalidaError, ValorNaoPodeSerVazioError, EntradaNumericaIncorretaError) as e:
                         print(f"Erro: {e}")
                         time.sleep(2)
                         continue
@@ -104,7 +113,7 @@ Resposta: ''')
 
             if escolha == "1":
                 limpar_terminal()
-                tipo = int(input(f'''\tTipo de Atividade
+                tipo = int(input(f'''	Tipo de Atividade
 
 {azul}[1]Tarefa
 [2]Projeto
@@ -162,6 +171,9 @@ Resposta: '''))
             print(f"Erro: {e}")
             time.sleep(2)
         except ValorNaoPodeSerVazioError as e:
+            print(f"Erro: {e}")
+            time.sleep(2)
+        except EntradaNumericaIncorretaError as e:
             print(f"Erro: {e}")
             time.sleep(2)
         except Exception as e:
