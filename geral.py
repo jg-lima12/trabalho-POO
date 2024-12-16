@@ -42,7 +42,7 @@ Resposta: ''')
             senha = input("Senha: ")
             if sistema.login(matricula, senha):
                 print("Login bem-sucedido!")
-                
+                limpar_terminal()
                 time.sleep(1)
                 
                 

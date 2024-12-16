@@ -12,12 +12,12 @@ class Aluno:
         self.__matricula = matricula
 
     def exibir_dados(self):
-        return (f"Nome: {self.__nome}\n"
-                f"Idade: {self.__idade}\n"
-                f"Turma: {self.__turma}\n"
-                f"Curso: {self.__curso}\n"
-                f"Tipo de Grade: {self.__tipo_grade}\n"
-                f"Matrícula: {self.__matricula}")
+        print(f'''Nome: {self.__nome}
+Idade: {self.__idade}
+Turma: {self.__turma}
+Curso: {self.__curso}
+Tipo de Grade: {self.__tipo_grade}
+Matrícula: {self.__matricula}''')
 
 
 # Classe base Atividade
