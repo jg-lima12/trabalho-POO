@@ -5,14 +5,14 @@ from cor import azul, fim
 import os
 import time
 
+class AtividadeNaoEncontrada(Exception):
+    pass
+
+class SenhaIncorreta(Exception):
+    pass
+
 def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
-
-class TipoAtividadeInvalido(Exception):
-    pass
-
-class DadoInvalido(Exception):
-    pass
 
 def main():
     sistema = SistemaDeUsuarios()
@@ -33,84 +33,83 @@ Resposta: ''')
             limpar_terminal()
             matricula = input("\nMatrícula: ")
             senha = input("Senha: ")
-            if sistema.login(matricula, senha):
-                time.sleep(1.5)
-                limpar_terminal()
-
-                print(f"\n{azul}Cadastro de Aluno{fim}")
-                nome = input("Nome completo: ")
-                idade = input("Idade: ")
-                turma = input("Turma: ")
-                curso = input("Curso: ")
-                tipo_grade = input("Tipo de Grade: ")
-                aluno = Aluno(nome, idade, turma, curso, tipo_grade, matricula)
-
-                while True:
+            try:
+                if sistema.login(matricula, senha):
+                    time.sleep(1.5)
                     limpar_terminal()
-                    print("\nGerenciamento de Atividades")
-                    print(f"{azul}[1]Adicionar Atividade{fim}")
-                    print(f"{azul}[2]Exibir Atividades{fim}")
-                    print(f"{azul}[3]Sair{fim}")
-                    escolha_atividade = input("\nEscolha uma opção: ")
 
-                    if escolha_atividade == "1":
+                    print(f"\n{azul}Cadastro de Aluno{fim}")
+                    nome = input("Nome completo: ")
+                    idade = input("Idade: ")
+                    turma = input("Turma: ")
+                    curso = input("Curso: ")
+                    tipo_grade = input("Tipo de Grade: ")
+                    aluno = Aluno(nome, idade, turma, curso, tipo_grade, matricula)
+
+                    while True:
                         limpar_terminal()
-                        try:
+                        print("\nGerenciamento de Atividades")
+                        print(f"{azul}[1]Adicionar Atividade{fim}")
+                        print(f"{azul}[2]Exibir Atividades{fim}")
+                        print(f"{azul}[3]Sair{fim}")
+                        escolha_atividade = input("\nEscolha uma opção: ")
+
+                        if escolha_atividade == "1":
+                            limpar_terminal()
                             tipo = int(input(f'''\nTipo de Atividade
 {azul}[1]Tarefa   [2]Projeto   [3]Trabalho   [4]Prova{fim}
 Resposta: '''))
 
-                            if tipo not in [1, 2, 3, 4]:
-                                raise TipoAtividadeInvalido("Tipo inválido. Tente novamente.")
+                            tipos_validos = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}
+                            tipo_str = tipos_validos.get(tipo)
 
-                            tipo_str = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}[tipo]
-                            titulo = input("\nTítulo: ")
-                            descricao = input("Descrição: ")
-                            data_entrega = input("Data de Entrega: ")
+                            if tipo_str: 
+                                titulo = input("\nTítulo: ")
+                                descricao = input("Descrição: ")
+                                data_entrega = input("Data de Entrega: ")
 
-                            if tipo_str == "Tarefa":
-                                disciplina = input("Disciplina: ")
-                                atividade = Tarefa(titulo, descricao, data_entrega, disciplina)
-                            elif tipo_str == "Projeto":
-                                tipo_projeto = input("Tipo de Projeto: ")
-                                professor_orientador = input("Professor Orientador: ")
-                                data_inicio = input("Data de Início: ")
-                                atividade = Projeto(titulo, descricao, data_entrega, tipo_projeto, professor_orientador, data_inicio)
-                            elif tipo_str == "Trabalho":
-                                disciplina = input("Disciplina: ")
-                                atividade = Trabalho(titulo, descricao, data_entrega, disciplina)
-                            elif tipo_str == "Prova":
-                                disciplina = input("Disciplina: ")
-                                horario = input("Horário: ")
-                                tentativa = input("Tentativa: ")
-                                atividade = Prova(titulo, descricao, data_entrega, disciplina, horario, tentativa)
+                                if tipo_str == "Tarefa":
+                                    disciplina = input("Disciplina: ")
+                                    atividade = Tarefa(titulo, descricao, data_entrega, disciplina)
+                                elif tipo_str == "Projeto":
+                                    tipo_projeto = input("Tipo de Projeto: ")
+                                    professor_orientador = input("Professor Orientador: ")
+                                    data_inicio = input("Data de Início: ")
+                                    atividade = Projeto(titulo, descricao, data_entrega, tipo_projeto, professor_orientador, data_inicio)
+                                elif tipo_str == "Trabalho":
+                                    disciplina = input("Disciplina: ")
+                                    atividade = Trabalho(titulo, descricao, data_entrega, disciplina)
+                                elif tipo_str == "Prova":
+                                    disciplina = input("Disciplina: ")
+                                    horario = input("Horário: ")
+                                    tentativa = input("Tentativa: ")
+                                    atividade = Prova(titulo, descricao, data_entrega, disciplina, horario, tentativa)
 
-                            gerenciador.adicionar_atividade(tipo_str, atividade)
-                            time.sleep(2)
+                                gerenciador.adicionar_atividade(tipo_str, atividade)
+                                time.sleep(2)
+                            else:
+                                raise AtividadeNaoEncontrada("Tipo de atividade não encontrado. Tente novamente.")
+                        elif escolha_atividade == "2":
+                            limpar_terminal()
+                            print(f"{azul}\nAtividades Cadastradas:{fim}")
+                            gerenciador.exibir_atividades()
+                            input(f"{azul}\nPressione ENTER para continuar...{fim}")
 
-                        except TipoAtividadeInvalido as e:
-                            print(e)
+                        elif escolha_atividade == "3":
+                            print("\nSaindo...")
+                            time.sleep(1)
+                            break
+                        else:
+                            print("Escolha inválida. Tente novamente.")
                             time.sleep(1.5)
-
-                        except ValueError:
-                            print("Entrada inválida. Por favor, insira um número válido.")
-                            time.sleep(1.5)
-
-                    elif escolha_atividade == "2":
-                        limpar_terminal()
-                        print(f"{azul}\nAtividades Cadastradas:{fim}")
-                        gerenciador.exibir_atividades()
-                        input(f"{azul}\nPressione ENTER para continuar...{fim}")
-
-                    elif escolha_atividade == "3":
-                        print("\nSaindo...")
-                        time.sleep(1)
-                        break
-                    else:
-                        print("Escolha inválida. Tente novamente.")
-                        time.sleep(1.5)
-            else:
-                input(f"\n{azul}Login falhou. Pressione ENTER para tentar novamente.{fim}")
+                else:
+                    raise SenhaIncorreta("Matrícula ou senha incorretos.")
+            except SenhaIncorreta as e:
+                print(f"Erro: {e}")
+                input(f"{azul}Pressione ENTER para tentar novamente.{fim}")
+            except AtividadeNaoEncontrada as e:
+                print(f"Erro: {e}")
+                input(f"{azul}Pressione ENTER para tentar novamente.{fim}")
 
 if __name__ == "__main__":
     main()
