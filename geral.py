@@ -1,18 +1,21 @@
 from usuario import SistemaDeUsuarios
-from atividade import Aluno
-from gerenciador import GerenciadorDeAtividades, Tarefa, Projeto, Trabalho, Prova
+from atividade import Aluno, Tarefa, Projeto, Trabalho, Prova
+from gerenciador import GerenciadorDeAtividades
 from cor import azul, fim
 import os
 import time
 
-# Exceções personalizadas
 class TipoAtividadeInvalidoException(Exception):
-    def __init__(self, mensagem="Tipo de atividade inválido. Use um número entre 1 e 4."):
-        super().__init__(mensagem)
+    def __init__(self):
+        super().__init__("Tipo de atividade inválido. Escolha entre as opções apresentadas.")
 
 class EntradaNaoNumericaException(Exception):
-    def __init__(self, mensagem="Entrada inválida. Digite um número."):
-        super().__init__(mensagem)
+    def __init__(self):
+        super().__init__("Entrada inválida. Digite apenas números para escolher a opção.")
+
+class CampoVazioException(Exception):
+    def __init__(self, campo):
+        super().__init__(f"O campo '{campo}' não pode estar vazio. Por favor, preencha todas as informações.")
 
 def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -22,106 +25,138 @@ def main():
     gerenciador = GerenciadorDeAtividades()
 
     while True:
-        limpar_terminal()
-        escolha = input(f'''Escolha uma opção:
-{azul}[1]Cadastrar   [2]Login{fim}
+        try:
+            limpar_terminal()
+            escolha = input(f'''\nEscolha uma opção:
+{azul}[1]Cadastrar   [2]Login   [3]Sair{fim}
 Resposta: ''')
 
-        if escolha == "1":
-            limpar_terminal()
-            matricula = input("\nMatrícula: ")
-            senha = input("Senha: ")
-            sistema.cadastrar_usuario(matricula, senha)
-        elif escolha == "2":
-            limpar_terminal()
-            matricula = input("\nMatrícula: ")
-            senha = input("Senha: ")
-            if sistema.login(matricula, senha):
-                time.sleep(1.5)
+            if not escolha.isdigit():
+                raise EntradaNaoNumericaException()
+
+            escolha = int(escolha)
+
+            if escolha == 1:
                 limpar_terminal()
+                matricula = input("\nMatrícula: ").strip()
+                senha = input("Senha: ").strip()
+                sistema.cadastrar_usuario(matricula, senha)
 
-                print(f"\n{azul}Cadastro de Aluno{fim}")
-                nome = input("Nome completo: ")
-                idade = input("Idade: ")
-                turma = input("Turma: ")
-                curso = input("Curso: ")
-                tipo_grade = input("Tipo de Grade: ")
-                aluno = Aluno(nome, idade, turma, curso, tipo_grade, matricula)
-
-                while True:
+            elif escolha == 2:
+                limpar_terminal()
+                matricula = input("\nMatrícula: ").strip()
+                senha = input("Senha: ").strip()
+                if sistema.login(matricula, senha):
+                    time.sleep(2)
                     limpar_terminal()
-                    print("\nGerenciamento de Atividades")
-                    print(f"{azul}[1]Adicionar Atividade{fim}")
-                    print(f"{azul}[2]Exibir Atividades{fim}")
-                    print(f"{azul}[3]Sair{fim}")
-                    escolha_atividade = input("\nEscolha uma opção: ")
+                    print(f"\n{azul}Cadastro de Aluno{fim}")
+                    nome = input("Nome completo: ").strip()
+                    if not nome:
+                        raise CampoVazioException("Nome completo")
+                    idade = input("Idade: ").strip()
+                    turma = input("Turma: ").strip()
+                    curso = input("Curso: ").strip()
+                    tipo_grade = input("Tipo de Grade: ").strip()
+                    aluno = Aluno(nome, idade, turma, curso, tipo_grade, matricula)
+                    print("\nDados do Aluno:")
+                    aluno.exibir_dados()
+                    time.sleep(3)
 
-                    if escolha_atividade == "1":
+                    while True:
                         limpar_terminal()
-                        try:
-                            tipo = input(f'''\nTipo de Atividade
+                        print("\nGerenciamento de Atividades")
+                        print(f"\n{azul}[1]Adicionar Atividade{fim}")
+                        print(f"{azul}[2]Exibir Atividades{fim}")
+                        print(f"{azul}[3]Sair{fim}")
+                        opcao = input("\nEscolha uma opção: ").strip()
+
+                        if not opcao.isdigit():
+                            raise EntradaNaoNumericaException()
+
+                        opcao = int(opcao)
+
+                        if opcao == 1:
+                            try:
+                                limpar_terminal()
+                                tipo = input(f'''\nTipo de Atividade
 {azul}[1]Tarefa   [2]Projeto   [3]Trabalho   [4]Prova{fim}
-Resposta: ''')
+Resposta: ''').strip()
 
-                            if not tipo.isdigit():
-                                raise EntradaNaoNumericaException()
+                                if not tipo.isdigit():
+                                    raise EntradaNaoNumericaException()
 
-                            tipo = int(tipo)  # Convertendo para número
-                            
-                            # Mapeamento de números para tipos de atividade
-                            tipos_validos = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}
-                            tipo_str = tipos_validos.get(tipo)
+                                tipo = int(tipo)
+                                tipos_validos = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}
+                                tipo_str = tipos_validos.get(tipo)
 
-                            if not tipo_str:  # Se o tipo for inválido
-                                raise TipoAtividadeInvalidoException()
+                                if not tipo_str:
+                                    raise TipoAtividadeInvalidoException()
 
-                            titulo = input("\nTítulo: ")
-                            descricao = input("Descrição: ")
-                            data_entrega = input("Data de Entrega: ")
+                                titulo = input("\nTítulo: ").strip()
+                                if not titulo:
+                                    raise CampoVazioException("Título")
+                                descricao = input("Descrição: ").strip()
+                                if not descricao:
+                                    raise CampoVazioException("Descrição")
+                                data_entrega = input("Data de Entrega: ").strip()
+                                if not data_entrega:
+                                    raise CampoVazioException("Data de Entrega")
 
-                            if tipo_str == "Tarefa":
-                                disciplina = input("Disciplina: ")
-                                atividade = Tarefa(titulo, descricao, data_entrega, disciplina)
-                            elif tipo_str == "Projeto":
-                                tipo_projeto = input("Tipo de Projeto: ")
-                                professor_orientador = input("Professor Orientador: ")
-                                data_inicio = input("Data de Início: ")
-                                atividade = Projeto(titulo, descricao, data_entrega, tipo_projeto, professor_orientador, data_inicio)
-                            elif tipo_str == "Trabalho":
-                                disciplina = input("Disciplina: ")
-                                atividade = Trabalho(titulo, descricao, data_entrega, disciplina)
-                            elif tipo_str == "Prova":
-                                disciplina = input("Disciplina: ")
-                                horario = input("Horário: ")
-                                tentativa = input("Tentativa: ")
-                                atividade = Prova(titulo, descricao, data_entrega, disciplina, horario, tentativa)
+                                if tipo_str == "Tarefa":
+                                    disciplina = input("Disciplina: ").strip()
+                                    if not disciplina:
+                                        raise CampoVazioException("Disciplina")
+                                    atividade = Tarefa(titulo, descricao, data_entrega, disciplina)
 
-                            gerenciador.adicionar_atividade(tipo_str, atividade)
-                            print("\nAtividade adicionada com sucesso!")
+                                elif tipo_str == "Projeto":
+                                    tipo_projeto = input("Tipo de Projeto: ").strip()
+                                    professor_orientador = input("Professor Orientador: ").strip()
+                                    data_inicio = input("Data de Início: ").strip()
+                                    atividade = Projeto(titulo, descricao, data_entrega, tipo_projeto, professor_orientador, data_inicio)
+
+                                elif tipo_str == "Trabalho":
+                                    disciplina = input("Disciplina: ").strip()
+                                    if not disciplina:
+                                        raise CampoVazioException("Disciplina")
+                                    atividade = Trabalho(titulo, descricao, data_entrega, disciplina)
+
+                                elif tipo_str == "Prova":
+                                    disciplina = input("Disciplina: ").strip()
+                                    horario = input("Horário: ").strip()
+                                    tentativa = input("Tentativa: ").strip()
+                                    atividade = Prova(titulo, descricao, data_entrega, disciplina, horario, tentativa)
+
+                                gerenciador.adicionar_atividade(tipo_str, atividade)
+
+                            except (CampoVazioException, EntradaNaoNumericaException, TipoAtividadeInvalidoException) as e:
+                                print(f"\n{azul}Erro: {e}{fim}")
+                                time.sleep(2)
+
+                        elif opcao == 2:
+                            limpar_terminal()
+                            gerenciador.exibir_atividades()
+                            input(f'{azul}Pressione ENTER para continuar...{fim}')
+
+                        elif opcao == 3:
+                            print("Voltando ao menu principal...")
+                            time.sleep(1)
+                            break
+
+                        else:
+                            print("Escolha inválida. Tente novamente.")
                             time.sleep(2)
 
-                        except EntradaNaoNumericaException as e:
-                            print(f"\n{azul}Erro: {e}{fim}")
-                            time.sleep(2)
-                        except TipoAtividadeInvalidoException as e:
-                            print(f"\n{azul}Erro: {e}{fim}")
-                            time.sleep(2)
+            elif escolha == 3:
+                print("\nSaindo do sistema...")
+                break
 
-                    elif escolha_atividade == "2":
-                        limpar_terminal()
-                        print(f"{azul}\nAtividades Cadastradas:{fim}")
-                        gerenciador.exibir_atividades()
-                        input(f"{azul}\nPressione ENTER para continuar...{fim}")
-
-                    elif escolha_atividade == "3":
-                        print("\nSaindo...")
-                        time.sleep(1)
-                        break
-                    else:
-                        print("Escolha inválida. Tente novamente.")
-                        time.sleep(1.5)
             else:
-                input(f"\n{azul}Login falhou. Pressione ENTER para tentar novamente.{fim}")
+                print("Escolha inválida. Tente novamente.")
+                time.sleep(2)
+
+        except (EntradaNaoNumericaException, CampoVazioException) as e:
+            print(f"\n{azul}Erro: {e}{fim}")
+            time.sleep(2)
 
 if __name__ == "__main__":
     main()
