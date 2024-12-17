@@ -8,6 +8,12 @@ import time
 def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+class TipoAtividadeInvalido(Exception):
+    pass
+
+class DadoInvalido(Exception):
+    pass
+
 def main():
     sistema = SistemaDeUsuarios()
     gerenciador = GerenciadorDeAtividades()
@@ -49,15 +55,15 @@ Resposta: ''')
 
                     if escolha_atividade == "1":
                         limpar_terminal()
-                        tipo = int(input(f'''\nTipo de Atividade
+                        try:
+                            tipo = int(input(f'''\nTipo de Atividade
 {azul}[1]Tarefa   [2]Projeto   [3]Trabalho   [4]Prova{fim}
 Resposta: '''))
-                        
-                        # Mapeamento de números para tipos de atividade
-                        tipos_validos = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}
-                        tipo_str = tipos_validos.get(tipo)
 
-                        if tipo_str:  # Se o tipo for válido
+                            if tipo not in [1, 2, 3, 4]:
+                                raise TipoAtividadeInvalido("Tipo inválido. Tente novamente.")
+
+                            tipo_str = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}[tipo]
                             titulo = input("\nTítulo: ")
                             descricao = input("Descrição: ")
                             data_entrega = input("Data de Entrega: ")
@@ -81,8 +87,13 @@ Resposta: '''))
 
                             gerenciador.adicionar_atividade(tipo_str, atividade)
                             time.sleep(2)
-                        else:
-                            print("Tipo inválido. Tente novamente.")
+
+                        except TipoAtividadeInvalido as e:
+                            print(e)
+                            time.sleep(1.5)
+
+                        except ValueError:
+                            print("Entrada inválida. Por favor, insira um número válido.")
                             time.sleep(1.5)
 
                     elif escolha_atividade == "2":
