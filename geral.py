@@ -5,6 +5,11 @@ from cor import azul, fim
 import os
 import time
 
+# Exceção personalizada
+class TipoAtividadeInvalidoException(Exception):
+    def __init__(self, mensagem="Tipo de atividade inválido. Use um número entre 1 e 4."):
+        super().__init__(mensagem)
+
 def limpar_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -49,15 +54,18 @@ Resposta: ''')
 
                     if escolha_atividade == "1":
                         limpar_terminal()
-                        tipo = int(input(f'''\nTipo de Atividade
+                        try:
+                            tipo = int(input(f'''\nTipo de Atividade
 {azul}[1]Tarefa   [2]Projeto   [3]Trabalho   [4]Prova{fim}
 Resposta: '''))
-                        
-                        # Mapeamento de números para tipos de atividade
-                        tipos_validos = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}
-                        tipo_str = tipos_validos.get(tipo)
+                            
+                            # Mapeamento de números para tipos de atividade
+                            tipos_validos = {1: 'Tarefa', 2: 'Projeto', 3: 'Trabalho', 4: 'Prova'}
+                            tipo_str = tipos_validos.get(tipo)
 
-                        if tipo_str:  # Se o tipo for válido
+                            if not tipo_str:  # Se o tipo for inválido
+                                raise TipoAtividadeInvalidoException()
+
                             titulo = input("\nTítulo: ")
                             descricao = input("Descrição: ")
                             data_entrega = input("Data de Entrega: ")
@@ -80,10 +88,15 @@ Resposta: '''))
                                 atividade = Prova(titulo, descricao, data_entrega, disciplina, horario, tentativa)
 
                             gerenciador.adicionar_atividade(tipo_str, atividade)
+                            print("\nAtividade adicionada com sucesso!")
                             time.sleep(2)
-                        else:
-                            print("Tipo inválido. Tente novamente.")
-                            time.sleep(1.5)
+
+                        except TipoAtividadeInvalidoException as e:
+                            print(f"\n{azul}Erro: {e}{fim}")
+                            time.sleep(2)
+                        except ValueError:
+                            print(f"\n{azul}Erro: Entrada inválida. Digite um número.{fim}")
+                            time.sleep(2)
 
                     elif escolha_atividade == "2":
                         limpar_terminal()
